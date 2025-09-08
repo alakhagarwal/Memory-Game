@@ -10,13 +10,13 @@ function App() {
 
   return (
     <div className="my-container text-white max-w-[1600px] mx-auto w-full p-4">
-      <header className="text-7xl px-10 flex justify-between">
+      <header className="header-container text-7xl px-10 flex justify-between">
         <h1 className="text-red-700 font-bold ">
           Poke<span className="text-white">Game</span>
         </h1>
 
         <select
-          className="bg-gray-800 text-white text-xl rounded px-4 py-2 mt-6 cursor-pointer"
+          className="bg-gray-800 text-white text-xl rounded px-4 py-2 mt-6 cursor-pointer hover:bg-gray-700 transition-colors border border-gray-600"
           defaultValue={8}
           onChange={(e) => {
             setLevel(e.target.value);

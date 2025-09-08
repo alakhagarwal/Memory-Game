@@ -1,45 +1,311 @@
 @import "tailwindcss";
 
-/* Custom styles can go here - they will override Tailwind's Preflight */
-/* Preflight is automatically included with the above import */
-
 body {
-    background-color: black;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  background-color: black;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
+.my-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem 2rem;
+}
+
+
 .gamespace {
-    max-width: 1000px;
-    margin: auto;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    row-gap: 20px;
-    column-gap: 20px;
+  max-width: 1200px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  place-content: center;
+  justify-items: center;
+  align-items: center;
+  padding: 20px;
 }
 
 .card {
-    padding: 10px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
+  padding: 15px;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(255, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(145deg, #ffffff, #f0f0f0);
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
 
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 0, 0, 0.1),
+    transparent
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
 }
 
 .card:hover {
-    transform: scale(1.05);
-    box-shadow: 10px 10px 16px 10px red;
-    cursor: pointer;
+  transform: translateY(-10px) scale(1.05);
+  box-shadow: 0 15px 35px rgba(255, 0, 0, 0.4);
+  border-color: #dc2626;
+  cursor: pointer;
+}
+
+.card:hover::before {
+  opacity: 1;
 }
 
 .card img {
-    width: 180px;
-    height: 180px;
-    object-fit: contain;
+  width: 180px;
+  height: 180px;
+  object-fit: contain;
+  border-radius: 10px;
+  image-rendering: crisp-edges;
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.card:hover img {
+  transform: scale(1.1);
+  filter: drop-shadow(0 8px 16px rgba(255, 0, 0, 0.3));
+}
+
+.details {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 2rem auto;
+  max-width: 600px;
+}
+
+@media (min-width: 1200px) {
+  .gamespace {
+    grid-template-columns: repeat(5, 1fr);
+    max-width: 1400px;
+    gap: 25px;
+  }
+
+  .card img {
+    width: 200px;
+    height: 200px;
+  }
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+  .gamespace {
+    grid-template-columns: repeat(4, 1fr);
+    max-width: 1000px;
+  }
+
+  .card img {
+    width: 170px;
+    height: 170px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  .gamespace {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    padding: 15px;
+    max-width: 800px;
+  }
+
+  .card {
+    padding: 12px;
+  }
+
+  .card img {
+    width: 150px;
+    height: 150px;
+  }
+
+  .header-container {
+    padding: 1rem;
+  }
+
+  .my-container header h1 {
+    font-size: 3rem !important;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 767px) {
+  .gamespace {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    padding: 15px;
+    max-width: 500px;
+    justify-items: center;
+    align-items: center;
+  }
+
+  .card {
+    padding: 10px;
+  }
+
+  .card img {
+    width: 130px;
+    height: 130px;
+  }
+
+  .header-container {
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: center;
+    padding: 1rem;
+  }
+
+  .my-container header h1 {
+    font-size: 2.5rem !important;
+  }
+
+  .details {
+    padding: 1.5rem !important;
+    margin: 1rem auto !important;
+  }
+}
+
+@media (max-width: 575px) {
+  .my-container {
+    padding: 0.5rem !important;
+  }
+
+  .gamespace {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 10px;
+    max-width: 350px;
+    justify-items: center;
+    align-items: center;
+  }
+
+  .card {
+    padding: 8px;
     border-radius: 10px;
-    image-rendering: crisp-edges;
-    transition: transform 0.2s ease-in-out;
+  }
+
+  .card img {
+    width: 100px;
+    height: 100px;
+  }
+
+  .header-container {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+    padding: 0.5rem;
+  }
+
+  .my-container header h1 {
+    font-size: 2rem !important;
+    padding: 0 !important;
+  }
+
+  .my-container header select {
+    font-size: 1rem !important;
+    padding: 0.5rem 1rem !important;
+    margin-top: 0 !important;
+  }
+
+  .details {
+    padding: 1rem !important;
+    margin: 0.5rem auto !important;
+    font-size: 1rem !important;
+  }
+
+  .details .score p {
+    font-size: 1.2rem !important;
+  }
+
+  .details h5 {
+    font-size: 1rem !important;
+    line-height: 1.4;
+  }
+}
+
+@media (max-width: 375px) {
+  .gamespace {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    max-width: 300px;
+    justify-items: center;
+    align-items: center;
+  }
+
+  .card img {
+    width: 80px;
+    height: 80px;
+  }
+
+  .card {
+    padding: 6px;
+  }
+
+  .my-container header h1 {
+    font-size: 1.5rem !important;
+  }
+
+  .details {
+    font-size: 0.9rem !important;
+  }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .my-container {
+    padding: 0.5rem !important;
+  }
+
+  .header-container {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0.5rem;
+  }
+
+  .my-container header h1 {
+    font-size: 1.8rem !important;
+  }
+
+  .details {
+    padding: 0.5rem !important;
+    margin: 0.5rem auto !important;
+  }
+
+  .gamespace {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    padding: 8px;
+    justify-items: center;
+    align-items: center;
+  }
+
+  .card img {
+    width: 70px;
+    height: 70px;
+  }
 }
