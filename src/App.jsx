@@ -9,13 +9,6 @@ function App() {
   const [level, setLevel] = useState(8);
 
   return (
-
-    <>
-    <Head>
-      <link rel="icon" type="image/svg+xml" href="./assets/pokeball-pokemon-svgrepo-com.svg" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>PokeGame</title>
-    </Head>
     <div className="my-container text-white max-w-[1600px] mx-auto w-full p-4">
       <header className="header-container text-7xl px-10 flex justify-between">
         <h1 className="text-red-700 font-bold ">
@@ -55,7 +48,6 @@ function App() {
 
       <Gamespace score = {score} setScore = {setScore} bestScore={bestScore} setBestScore = {setBestScore} level = {level}></Gamespace>
     </div>
-    </>
   );
 }
 
