@@ -1,6 +1,40 @@
 import { useState, useEffect } from "react";
 import "../App.css";
 
+// Extracted PokemonCard component to handle individual image loading states
+function PokemonCard({ card, handleClick }) {
+  const [imgLoaded, setImgLoaded] = useState(false);
+
+  return (
+    <div
+      className="card bg-white p-1.5 cursor-pointer relative"
+      onClick={() => handleClick(card.name)}
+    >
+      {/* Loading skeleton - absolute positioned so it doesn't break CSS flex layout */}
+      {!imgLoaded && (
+        <div className="absolute inset-x-0 top-0 bottom-[40px] flex justify-center items-center z-10">
+          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-red-700"></div>
+        </div>
+      )}
+      
+      <img
+        src={card.src}
+        alt={card.name}
+        className=""
+        style={{ opacity: imgLoaded ? 1 : 0 }}
+        onLoad={() => setImgLoaded(true)}
+        onError={(e) => {
+          setImgLoaded(true);
+          e.target.style.display = "none";
+        }}
+      />
+      <div className="text-white bg-red-700 w-full p-1 rounded-lg text-center capitalize mt-auto z-20 relative">
+        {card.name}
+      </div>
+    </div>
+  );
+}
+
 export default function Gamespace({
   score,
   setScore,
@@ -11,10 +45,7 @@ export default function Gamespace({
   let [cards, setCards] = useState([]);
   const [selectedCards, setSelectedCards] = useState([]);
   let [pokemonData, setPokemonData] = useState([]); // Set on initial Render
-  const test = {
-    name: "kleavor",
-    src: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/900.png",
-  };
+  const [isFetching, setIsFetching] = useState(true); // Tracking overall fetch state
 
   async function fetchPokemons() {
     let limit = 40;
@@ -40,17 +71,18 @@ export default function Gamespace({
   }
 
   const shuffleArray = (array) => {
-    for (let i = array.length - 1; i > 0; i--) {
+    let newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
+      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
     }
-    return array;
+    return newArray;
   };
 
-  const handleClick = (e) => {
-    const clickedCardName = e.currentTarget.querySelector("div").textContent;
-    shuffleArray(cards);
-    setCards(cards);
+  const handleClick = (clickedCardName) => {
+    const shuffledCards = shuffleArray(cards);
+    setCards(shuffledCards);
+    
     if (selectedCards.includes(clickedCardName)) {
       if (score > bestScore) {
         setBestScore(score);
@@ -63,16 +95,17 @@ export default function Gamespace({
     }
     setScore(score + 1);
     // New card selected, increment score and add to selected cards
-    selectedCards.push(clickedCardName);
-    setSelectedCards(selectedCards);
+    const newSelectedCards = [...selectedCards, clickedCardName];
+    setSelectedCards(newSelectedCards);
     console.log("Clicked on: " + clickedCardName);
-    console.log("Selected Cards: ", selectedCards);
+    console.log("Selected Cards: ", newSelectedCards);
   };
 
   async function fetcheachPokemon(pokemonArray) {
     let finalPokemonArray = [];
     try {
-      for (const pokemon of pokemonArray) {
+      // Changed to Promise.all to fetch concurrently and speed up overall load time
+      const fetchPromises = pokemonArray.map(async (pokemon) => {
         let pokemonData = {};
         const pokemonDetails = await fetch(pokemon.url);
         pokemonData["name"] = pokemon.name;
@@ -97,10 +130,15 @@ export default function Gamespace({
           // Skip Pokemon without images
           if (src) {
             pokemonData["src"] = src;
-            finalPokemonArray.push(pokemonData);
+            return pokemonData;
           }
         }
-      }
+        return null;
+      });
+
+      const results = await Promise.all(fetchPromises);
+      finalPokemonArray = results.filter((p) => p !== null);
+
       return finalPokemonArray;
     } catch (error) {
       console.error("Error fetching individual pokemon details:", error);
@@ -126,6 +164,7 @@ export default function Gamespace({
   }
 
   useEffect(() => {
+    setIsFetching(true);
     fetchPokemons().then((pokemons) => {
       console.log(pokemons);
       const pokemonArray = pokemons.results;
@@ -135,11 +174,12 @@ export default function Gamespace({
         console.log("Detailed Pokemons:", detailedPokemons);
         const pokemons = detailedPokemons;
         setPokemonData(pokemons); // 40 pokemons set
-
-        // let cardsData = getRandomCards(pokemons, level);
-        // setCards(cardsData);
-        // console.log("Cards Data:", cardsData);
+        setIsFetching(false);
+      }).catch(() => {
+        setIsFetching(false);
       });
+    }).catch(() => {
+      setIsFetching(false);
     });
   }, []);
 
@@ -151,29 +191,18 @@ export default function Gamespace({
     }
     setScore(0);
     setSelectedCards([]);
-  }, [level, pokemonData]);
+  }, [level, pokemonData, setScore]); // added setScore to deps
 
   return (
-    <div className="gamespace">
-      {cards.map((card) => (
-        <div
-          key={card.name}
-          className="card bg-white p-1.5"
-          onClick={handleClick}
-        >
-          <img
-            src={card.src}
-            alt={card.name}
-            className=""
-            loading="lazy"
-            onError={(e) => {
-              e.target.style.display = "none";
-            }}
-          />
-          <div className="text-white bg-red-700 w-full p-1 rounded-lg text-center capitalize">
-            {card.name}
-          </div>
+    <div className={`gamespace ${isFetching ? 'flex justify-center items-center min-h-[400px]' : ''}`}>
+      {isFetching && (
+        <div className="flex flex-col items-center justify-center w-full col-span-full mt-10">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-red-700 mb-4 mx-auto"></div>
+          <p className="text-xl text-white font-bold text-center">Catching Pokémon...</p>
         </div>
+      )}
+      {!isFetching && cards.map((card) => (
+        <PokemonCard key={card.name} card={card} handleClick={handleClick} />
       ))}
     </div>
   );
